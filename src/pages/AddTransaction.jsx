@@ -1,32 +1,38 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import TransactionForm from '../components/TransactionForm';
+import { addTransaction } from '../services/api';
 
 const AddTransaction = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (data) => {
+    setLoading(true);
+    try {
+      await addTransaction(data);
+      alert("✅ Transaction added successfully!");
+      navigate('/');           // Go back to dashboard
+    } catch (error) {
+      console.error(error);
+      alert("❌ Failed to add transaction. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold">Add New Transaction</h1>
-        <button 
-          onClick={() => navigate('/home')}
-          className="text-gray-400 hover:text-white transition-colors"
-        >
-          ← Back to Dashboard
-        </button>
+        <p className="text-gray-400 mt-2">Fill in the details below</p>
       </div>
 
-      <div className="bg-gray-900 p-8 rounded-2xl">
-        <p className="text-gray-400 text-center py-12 text-lg">
-          This is where Member 4 should build the full Transaction Form.<br />
-          (Income/Expense toggle, Amount, Category, Description, Date, etc.)
-        </p>
-        
-        <div className="text-center mt-6">
-          <p className="text-sm text-gray-500">
-            Member 4's responsibility: Full form with validation + submit logic
-          </p>
-        </div>
+      <div className="bg-gray-900 rounded-3xl p-8">
+        <TransactionForm onSubmit={handleSubmit} />
       </div>
+
+      {loading && <p className="text-center mt-6 text-emerald-400">Saving transaction...</p>}
     </div>
   );
 };
